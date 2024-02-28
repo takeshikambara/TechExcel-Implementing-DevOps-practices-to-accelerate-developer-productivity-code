@@ -18,6 +18,10 @@
       # We run this on an Ubuntu-based GitHub hosted runner. This hosted runner
       # has certain software already installed, including az cli
       runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        pages: write
+        id-token: write
       steps:
       # Check out the code. This grabs code from the repository and
       # makes it available to the GitHub hosted runner. It will usually be the
@@ -32,9 +36,9 @@
         # https://github.com/azure/login
       - uses: azure/login@v1
         with:
-          client-id: $
-          tenant-id: $
-          subscription-id: $
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           # We also need to ensure that enable-AzPSSession is true. This is important for
           # using OIDC in Azure. If we were to pass in a client secret instead, we would not need
           # this setting enabled
@@ -45,8 +49,8 @@
         # https://github.com/azure/arm-deploy
         uses: azure/arm-deploy@v1
         with:
-          subscriptionId: $
-          resourceGroupName: $
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./InfrastructureAsCode/main.bicep
           # Use the environment variable called targetEnv
-          parameters: environment=$
+          parameters: environment=${{ env.targetEnv }}
